@@ -1,1 +1,2 @@
-# DB2-Group43-Web
+# DB2_Optional_Project WEB Project
+Repository for the Database 2 Optional Project development. A.Y 2020/2021 @Polimi
