@@ -1,10 +1,11 @@
-CREATE DATABASE  IF NOT EXISTS `db_project_db2` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `db_project_db2`;
 -- MySQL dump 10.13  Distrib 8.0.21, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db_project_db2
 -- ------------------------------------------------------
 -- Server version	8.0.21
+
+CREATE DATABASE  IF NOT EXISTS `db_project_db2` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `db_project_db2`;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -25,14 +26,15 @@ DROP TABLE IF EXISTS `answer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `answer` (
+  `idanswer` int NOT NULL AUTO_INCREMENT,
   `iduser` int NOT NULL,
-  `idquestionnaire` int NOT NULL,
-  `numberquestion` int NOT NULL,
+  `idquestion` int NOT NULL,
   `text` varchar(200) NOT NULL,
-  PRIMARY KEY (`iduser`,`idquestionnaire`,`numberquestion`),
-  KEY `answer_f02_idx` (`idquestionnaire`,`numberquestion`),
-  CONSTRAINT `answer_f01` FOREIGN KEY (`iduser`) REFERENCES `user` (`iduser`),
-  CONSTRAINT `answer_f02` FOREIGN KEY (`idquestionnaire`, `numberquestion`) REFERENCES `question` (`idquestionaire`, `numberquestion`)
+  PRIMARY KEY (`idanswer`),
+  KEY `answer_f01_idx` (`iduser`),
+  KEY `answer_f02_idx` (`idquestion`),
+  CONSTRAINT `answer_f01` FOREIGN KEY (`iduser`) REFERENCES `user` (`iduser`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `answer_f02` FOREIGN KEY (`idquestion`) REFERENCES `question` (`idquestion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -100,11 +102,11 @@ DROP TABLE IF EXISTS `question`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `question` (
-  `idquestionaire` int NOT NULL,
+  `idquestion` int NOT NULL AUTO_INCREMENT,
+  `idquestionnaire` int NOT NULL,
   `numberquestion` int NOT NULL,
   `text` varchar(200) NOT NULL,
-  PRIMARY KEY (`idquestionaire`,`numberquestion`),
-  CONSTRAINT `question_f01` FOREIGN KEY (`idquestionaire`) REFERENCES `questionnaire` (`idquestionnaire`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`idquestion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -154,15 +156,17 @@ DROP TABLE IF EXISTS `questionnaire_interaction`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `questionnaire_interaction` (
+  `idquestionnaire_interaction` int NOT NULL AUTO_INCREMENT,
   `iduser` int NOT NULL,
   `idquestionnaire` int NOT NULL,
   `logtimestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `completed` binary(1) NOT NULL,
   `score` int NOT NULL DEFAULT '0',
-  PRIMARY KEY (`iduser`,`idquestionnaire`),
+  PRIMARY KEY (`idquestionnaire_interaction`),
   KEY `questionnaire_interaction_f02_idx` (`idquestionnaire`),
-  CONSTRAINT `questionnaire_interaction_f01` FOREIGN KEY (`iduser`) REFERENCES `user` (`iduser`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `questionnaire_interaction_f02` FOREIGN KEY (`idquestionnaire`) REFERENCES `questionnaire` (`idquestionnaire`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `qst_int_f01_idx` (`iduser`),
+  CONSTRAINT `qst_int_f01` FOREIGN KEY (`iduser`) REFERENCES `user` (`iduser`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `qst_int_f02` FOREIGN KEY (`idquestionnaire`) REFERENCES `questionnaire` (`idquestionnaire`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -183,13 +187,15 @@ DROP TABLE IF EXISTS `review`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `review` (
+  `idreview` int NOT NULL,
   `idproduct` int NOT NULL,
   `iduser` int NOT NULL,
   `text` varchar(200) NOT NULL,
-  PRIMARY KEY (`idproduct`,`iduser`),
-  KEY `review_f02_idx` (`iduser`),
-  CONSTRAINT `review_f01` FOREIGN KEY (`idproduct`) REFERENCES `product` (`idproduct`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `review_f02` FOREIGN KEY (`iduser`) REFERENCES `user` (`iduser`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`idreview`),
+  KEY `review_f01_idx` (`iduser`),
+  KEY `review_f02_idx` (`idproduct`),
+  CONSTRAINT `review_f01` FOREIGN KEY (`iduser`) REFERENCES `user` (`iduser`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `review_f02` FOREIGN KEY (`idproduct`) REFERENCES `product` (`idproduct`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -219,7 +225,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`iduser`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,4 +254,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-12-03 18:32:31
+-- Dump completed on 2020-12-16 11:35:48
