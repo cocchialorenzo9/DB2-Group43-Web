@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Questionnaire page</title>
+</head>
+<body>
+	<h1>Questionnaire page</h1>
+	
+	<!--  displaying product of the day name and image at the beginning -->
+	<h2 th:text=" ${'Product of the day : ' + product.name}"></h2>
+	<img th:src="@{${product.image}}" style="width: 500px; height: auto;"/>
+	
+	<!--  displaying marketing questions first -->
+	<div class="marketing_section">
+		<h3>First section: Marketing questions</h3>
+		<p>Please provide an answer to all the questions below. It is mandatory to fully complete this part of the questionnaire.</p>
+		
+		<div class="marketing_questions"></div>
+	</div>
+		
+	<!--  if no questionnaire is available for today, display an error -->
+	<p th:text=" ${errorMsg}"></p> 
+	
+	
+
+</body>
+</html>
