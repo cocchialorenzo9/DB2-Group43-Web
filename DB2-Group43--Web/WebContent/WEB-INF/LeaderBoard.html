@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>LeaderBoard</title>
+<link rel="stylesheet" type="text/css" href="css/leaderBoard.css">
+</head>
+
+<div class="topnav">
+		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
+		<a th:href="@{/Logout}" class="active">Logout</a>
+	   <a th:href=@{/Logout}>Questionnaire</a>
+	   <a th:href="@{/GoToUserHomePage}">HomePage</a>  
+</div>	
+<div class= "center" th:if="${#lists.isEmpty(questionnaireInteractions)}"> <h2 class = "text"> Questionnaire of the day was not created yet</h2></div>
+
+<div class= "center" th:if="${ not #lists.isEmpty(questionnaireInteractions)}">
+	
+	<table style="margin-top: 10%">
+		<thead>
+			<tr >
+				<th>Ranking</th>
+				<th>Username</th>
+				<th>Score</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="qI : ${questionnaireInteractions}">
+				<td th:text="${qIStat.count}"></td>
+				<td th:text="${qI.getUser().getUsername()}"></td>
+				<td th:text="${qI.getScore()}"></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+</html>

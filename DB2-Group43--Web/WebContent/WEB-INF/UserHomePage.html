@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>UserHomePage</title>
+<link rel="stylesheet" type="text/css" href="css/userHomePage.css">
+</head>
+
+<div class="topnav">
+		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
+		<a th:href="@{/Logout}" class="active">Logout</a>
+	   <a th:href="@{/GoToQuestionnairePage}">Questionnaire</a>
+	   <a th:href="@{/GoToLeaderBoard}">LeaderBoard</a>  
+</div>	
+ 
+
+
+<div th:if="${productOfTheDay == null}"> <h2 class="text" style = "margin-left: 5% "th:text = "${questionnaireNotCreated}"></h2></div>
+
+<div th:if="${productOfTheDay != null}">
+	<h2 style = "text-align: center " class = "text" th:text="${productOfTheDay.getName() + ' is the product of the day'}"></h2>
+	<img th:src="@{${productOfTheDay.getImage()}}" class = "image" />
+</div>
+
+<div th:if="${productOfTheDay != null}">
+	<h3 style = "margin-left: 5%" class = "text">Reviews</h3>
+	
+	<table style = "margin-left: 5%">
+		<thead></thead>
+		<tbody>
+			<tr th:each="review: ${reviews}">
+				<td>
+				<p th:text="${review.getUser().getUsername()}" class = "usernameReview"> </p>
+				<p th:text="${review.getText()} " class = "text"> </p>
+				<hr />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
+</div>
+
+
+</html>

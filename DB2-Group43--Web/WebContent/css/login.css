@@ -1,0 +1,50 @@
+/* Bordered form */
+form {
+  border: 3px solid #f1f1f1;
+  max-width: 64em;
+  margin: auto;
+}
+
+.text{
+	font-family: Helvetica;
+}
+
+.box{
+	
+  margin: auto;
+  width: 50%;
+  border-radius: 5px;
+  padding: 50px;
+}
+/* Full-width inputs */
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+}
+
+/* The "Forgot password" text */
+span.psw {
+  float: right;
+  padding-top: 16px;
+  font-family: Helvetica;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+  span.psw {
+    display: block;
+    float: none;
+  }
+  .cancelbtn {
+    width: 100%;
+  }
+}

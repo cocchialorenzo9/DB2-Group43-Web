@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Login page</title>
+<link rel="stylesheet" type="text/css" href="css/login.css">
+</head>
+<h1 style = "text-align: center " class = "text">DB2 Group 43 Exam Project</h1>
+
+<div class="box">
+
+	<form action="CheckLogin" method="POST">
+	
+	  <div class="container">
+	    <label for="uname" class = "text" ><b>Username</b></label>
+	    <input type="text" placeholder="Enter Username" spellcheck='false' name="usrn" required>
+	
+	    <label for="psw" class = "text"><b>Password</b></label>
+	    <input type="password" placeholder="Enter Password" name="pwd" required>
+	
+	    <input type="submit" value="Login">
+	    <p th:text=" ${errorMsg}"></p>
+	    <span class="psw" style = "margin-top: 5px">Are you not registered? Click <a href="registerPage.html"><b>here</b></a></span>
+	  </div>
+	
+	</form>
+</div>
+</html>
