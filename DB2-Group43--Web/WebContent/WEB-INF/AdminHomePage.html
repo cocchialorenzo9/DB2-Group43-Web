@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Admin page</title>
+</head>
+<body>
+	<h1>Admin page</h1>
+	
+	<a th:href="@{/Admin/GetCreationPage}">Click</a> to create a new product of the day <br>
+	
+	<div th:if="${not #lists.isEmpty(adminProducts)}">
+		<table style="margin-left: 5%" border="1">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Image</th>
+					<th>Date</th>
+					<th>Inspection page</th>
+					<th>Delete</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="product : ${adminProducts}">
+					<td th:text="${product.name}">Mock name</td>
+					<td th:text="@{${product.image}}">Mock image</td>
+					<td th:text="${#dates.format(productDays.get(__${product.idproduct}__), 'dd/MMM/yyyy')}">Mock date</td>
+					<td>
+						<a th:href="@{/Admin/GetInspectionPage(idproduct=${product.idproduct})}">More info</a>
+					</td>
+					<td>
+						<!-- checking if the date is right to allow deletion -->
+						 
+						<span th:if="${productDays.get(__${product.idproduct}__).before(#dates.createToday())}">
+							<a th:href="@{/Admin/DeleteQuestionnaire(idproduct=${product.idproduct})}">Delete this</a>
+						</span>
+						<span th:if="not ${productDays.get(__${product.idproduct}__).before(#dates.createToday())}">
+							Can't delete
+						</span>
+						
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div th:if="${#lists.isEmpty(adminProducts)}">
+		<p>You have no products yet <a th:href="@{/Admin/GetCreationPage}">click here</a> to create a new one!</p>
+	</div>
+
+</body>
+</html>

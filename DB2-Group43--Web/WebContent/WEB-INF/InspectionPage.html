@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<!-- add js to show and hide the lists with a short animation -->
+<meta charset="ISO-8859-1">
+<title>Inspection page</title>
+</head>
+<body>
+	<h1>Inspection page</h1>
+	
+	<a th:href="@{/Admin/GoToHomepage}">Back to homepage</a> <br>
+	
+	<h3>Inspection page for product: <span th:text="${product.name}">Product Name</span></h3>
+	
+	<!-- Print completed usernames list -->
+	<div>
+		<div th:if="${not #lists.isEmpty(completedUsernames)}">
+			<h4>Click to see the list of users who submitted the questionnaire</h4>
+			<table border="1" style="margin-left: 5%">
+				<thead>
+					<tr>
+						<th>Username List</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="usrn : ${completedUsernames}">
+						<td th:text="${usrn}">Mock text</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div th:if="${#lists.isEmpty(completedUsernames)}">
+			<h4>No User has submitted</h4>
+		</div>
+	</div>
+	
+	<!-- Print cancelled usernames list -->
+	<div>
+		<div th:if="${not #lists.isEmpty(cancelledUsernames)}">
+			<h4>Click to see the list of users who cancelled the respones to the questionnaire</h4>
+			<table border="1" style="margin-left: 5%">
+				<thead>
+					<tr>
+						<th>Username List</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="usrn : ${cancelledUsernames}">
+						<td th:text="${usrn}">Mock text</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div th:if="${#lists.isEmpty(cancelledUsernames)}">
+			<h4>No User has cancelled</h4>
+		</div>
+	</div>
+	
+	<!-- Print questionnaire answers -->
+	<div th:if="${not #lists.isEmpty(completedUsernames)}">
+	<h4>Click to see the answers to the questions</h4>
+	<table border="1" style="margin-left: 5%">
+		<thead>
+			<tr>
+				<th>Question</th>
+				<th>Answer</th>
+				<th>Username</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="ans : ${allAnswers}">
+				<td th:text="${ans.question}">Mock text</td>
+				<td th:text="${ans.answer}">Mock text</td>
+				<td th:text="${ans.username}">Mock text</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	
+
+</body>
+</html>

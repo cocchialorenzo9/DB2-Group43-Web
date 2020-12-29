@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+<!-- <script src="/DB2-Group43--Web/scripts/creationForm.js" charset="utf-8" defer></script> -->
+<meta charset="ISO-8859-1">
+<title>Creation page</title>
+</head>
+<body>
+	<h1>Creation page</h1>
+	
+	<!-- <h3>Welcome back <span th:text="${session.user.name}">mockup</span>! </h3> -->
+
+	<form th:action="@{/Admin/NewProduct}" method="POST">
+		<fieldset>
+			Name of the product: <input name="productName" type="text" placeholder="Insert the name of the product here ..." required><br>
+			Product day: <input name="productDay" type="date" min="${#dates.createNowForTimeZone()}" required><br>
+			<!--  TODO: set jpg, png as allowed files -->
+			Insert image URL of the product: <input name="urlImg" type="text" required><br>
+			Number of marketing questions: <input type="number" name="numQuest" id="numberQuest" value=1 min=1 required>
+			<fieldset id="marketingQuestions">
+			<!-- link between numbers and number of questions is implemented by JS -->
+			<span>Marketing questions:<br></span>
+			</fieldset>
+			<input type="submit" value="submit">
+		</fieldset>
+	</form>
+
+</body>
+<script th:inline="javascript">
+(function() { //IIFE
+	$(document).ready(function(){
+		
+		updateQuestionsFieldset(); // to create at least the first question
+		
+		$("#numberQuest").bind("change", updateQuestionsFieldset);		
+		
+		function updateQuestionsFieldset(){
+			$("#marketingQuestions").hide(300);
+			$("#marketingQuestions").html("");
+			console.log("update on questions' number invoked");
+			var numQuest = $("#numberQuest").val();
+			console.log("retreived " + numQuest + " as a number of questions");
+						
+			for(var i = 0; i < numQuest; i++){
+				var newInput = $("<input type='text' name='question" + i + "' placeholder='Insert " + i + " question' required><br>");
+				$(newInput).appendTo("#marketingQuestions");
+			}
+			
+			$("#marketingQuestions").show(300);
+		}
+		
+	});
+})();
+</script>
+</html>
