@@ -9,7 +9,7 @@
 <div class="topnav">
 		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
 		<a th:href="@{/Logout}" class="active">Logout</a>
-	   <a th:href=@{/Logout}>Questionnaire</a>
+	   <a th:href=@{/User/CheckQuestionnaireInteraction}>Questionnaire</a>
 	   <a th:href="@{/GoToUserHomePage}">HomePage</a>  
 </div>	
 <div class= "center" th:if="${#lists.isEmpty(questionnaireInteractions)}"> <h2 class = "text"> Questionnaire of the day was not created yet</h2></div>

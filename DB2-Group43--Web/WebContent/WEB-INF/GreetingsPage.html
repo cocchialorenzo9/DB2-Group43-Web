@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Greetings page</title>
+<link rel="stylesheet" type="text/css" href="questionnairePage.css">
+</head>
+<body>
+	<div class="topnav">
+		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
+		<a th:href="@{/Logout}" class="active">Logout</a>
+	   <a th:href="@{/User/CheckQuestionnaireInteraction}">Questionnaire</a>
+	   <a th:href="@{/GoToLeaderBoard}">LeaderBoard</a>  
+	   <a th:href="@{/GoToUserHomePage}">HomePage</a>   
+	</div>	
+	
+	<h2>Thank you!</h2>
+	
+	<p> Thanks for filling up the questionnaire of the day</p> 
+
+</body>
+</html>

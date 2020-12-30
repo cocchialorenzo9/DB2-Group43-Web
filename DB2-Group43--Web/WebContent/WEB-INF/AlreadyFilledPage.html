@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Already Filled page</title>
+<link rel="stylesheet" type="text/css" href="questionnairePage.css">
+</head>
+<body>
+	<div class="topnav">
+		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
+		<a th:href="@{/Logout}" class="active">Logout</a>
+	   <a th:href="@{/User/CheckQuestionnaireInteraction}">Questionnaire</a>
+	   <a th:href="@{/GoToLeaderBoard}">LeaderBoard</a>  
+	   <a th:href="@{/GoToUserHomePage}">HomePage</a>   
+	</div>	
+	
+	<h2>Try again tomorrow</h2>
+	
+	<p> You already filled up the questionnaire of the day, come back tomorrow for more questionnaires.</p> 
+
+</body>
+</html>
