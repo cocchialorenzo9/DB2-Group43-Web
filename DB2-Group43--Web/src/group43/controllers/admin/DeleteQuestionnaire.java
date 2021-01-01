@@ -16,6 +16,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import group43.entities.Questionnaire;
 import group43.entities.User;
@@ -49,6 +50,10 @@ public class DeleteQuestionnaire extends HttpServlet {
 		// retrieve questionnaire from request parameter idproduct
 		Integer idproduct = null;
 		try {
+			String idproductStr = StringEscapeUtils.escapeJava(request.getParameter("idproduct"));
+			if(idproductStr.isEmpty() || idproductStr == null) {
+				throw new NumberFormatException();
+			}
 			idproduct = Integer.parseInt(request.getParameter("idproduct"));
 		} catch (NumberFormatException e) {
 			response.sendError(505, "Questionnaire id not parsable");

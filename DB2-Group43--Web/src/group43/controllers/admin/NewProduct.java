@@ -23,6 +23,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import group43.entities.Product;
 import group43.entities.Questionnaire;
@@ -33,7 +34,8 @@ import group43.services.QuestionnaireService;
 
 /*
  * Not only inserts a new product to the DB, but adds even a 
- * new questionnaire related to that product
+ * new questionnaire related to that product and the questions
+ * related to it
  */
 
 @WebServlet("/Admin/NewProduct")
@@ -70,9 +72,18 @@ public class NewProduct extends HttpServlet {
 		// check parameters {name, day, urlimg, List<question>}
 		String errString = "ERROR ";
 		boolean error = false;
-		// retrieve data
-		String name = request.getParameter("productName");
-		String stringDate = request.getParameter("productDay");
+		// retrieve data and check consistency
+		String name = null;
+		String stringDate = null;
+		String urlImage = null;
+		name = StringEscapeUtils.escapeJava(request.getParameter("productName"));
+		stringDate = StringEscapeUtils.escapeJava(request.getParameter("productDay"));
+		urlImage = StringEscapeUtils.escapeJava(request.getParameter("urlImg"));
+		if(name == null || stringDate == null || urlImage == null ||
+				name.isEmpty() || stringDate.isEmpty() || urlImage.isEmpty()) {
+			errString += " input not parsable";
+			error = true;
+		}
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = null;
 		try {
@@ -82,7 +93,7 @@ public class NewProduct extends HttpServlet {
 			errString += ": date not parsable ";
 			error = true;
 		}
-		String urlImage = request.getParameter("urlImg");
+		
 		int numQuestions = -1;
 		try {
 			numQuestions = Integer.parseInt(request.getParameter("numQuest"));
@@ -93,9 +104,10 @@ public class NewProduct extends HttpServlet {
 		List<String> marketingQuestions = new ArrayList<>();
 		if(numQuestions != -1) {
 			for(int i = 0; i < numQuestions; i++) {
+				// JS in client-side sets the questions' name to question0, question 1, ... depending on the total number of questions
 				String thisPar = "question" + i;
-				String thisQuest = request.getParameter(thisPar);
-				if(thisQuest == null) {
+				String thisQuest = StringEscapeUtils.escapeJava(request.getParameter(thisPar));
+				if(thisQuest == null || thisQuest.isEmpty()) {
 					i = numQuestions;
 					errString += ": " + i + " question not retrievable";
 					marketingQuestions = new ArrayList<>();
@@ -122,7 +134,16 @@ public class NewProduct extends HttpServlet {
 				errString += ": date inserted is before today, can not insert ";
 				error = true;
 			}
+			
+			// call service to check if there is another product date
+			if(questService.isAlreadyDayOfAnotherQuestionnaire(new java.sql.Date(date.getTime()))) {
+				errString += "there is already another product with that date";
+				error = true;
+			}
 		}
+		
+		
+		
 		
 		
 		if(error) {
@@ -145,8 +166,8 @@ public class NewProduct extends HttpServlet {
 
 		java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 		
-		// Product newProduct = prodService.newProduct(name, urlImage);
-		Product newProduct = new Product(name, urlImage);
+		Product newProduct = prodService.newProduct(name, urlImage);
+		// Product newProduct = new Product(name, urlImage);
 		Questionnaire questionnaire = questService.newQuestionnaire(sqlDate, idadmin, newProduct);
 		questionService.newQuestions(questionnaire, marketingQuestions);
 		

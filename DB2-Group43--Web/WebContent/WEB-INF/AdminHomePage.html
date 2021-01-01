@@ -23,7 +23,7 @@
 			<tbody>
 				<tr th:each="product : ${adminProducts}">
 					<td th:text="${product.name}">Mock name</td>
-					<td th:text="@{${product.image}}">Mock image</td>
+					<td><img th:src="@{${product.image}}" class="image"/></td>
 					<td th:text="${#dates.format(productDays.get(__${product.idproduct}__), 'dd/MMM/yyyy')}">Mock date</td>
 					<td>
 						<a th:href="@{/Admin/GetInspectionPage(idproduct=${product.idproduct})}">More info</a>

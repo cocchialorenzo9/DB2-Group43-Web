@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -55,7 +56,11 @@ public class GetInspectionPage extends HttpServlet {
 		// retrieve the idproduct parameter to get the inspection page
 		Integer idproduct = null;
 		try {
-			idproduct = Integer.parseInt(request.getParameter("idproduct"));
+			String idproductStr = StringEscapeUtils.escapeJava(request.getParameter("idproduct"));
+			if(idproductStr.isEmpty() || idproductStr == null) {
+				throw new NumberFormatException();
+			}
+			idproduct = Integer.parseInt(idproductStr);
 		} catch (NumberFormatException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Id product not parsable");
 			return;

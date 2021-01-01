@@ -22,6 +22,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import group43.entities.Product;
 import group43.entities.Questionnaire;
 import group43.entities.User;
+import group43.exceptions.ProductException;
 import group43.services.ProductService;
 
 /**
@@ -55,14 +56,18 @@ public class GoToHomepageAdmin extends HttpServlet {
 		int idcreator = admin.getIduser();
 		
 		// retrieve all the admin products
-		List<Product> adminProducts = prodService.findProductsByCreatorId(idcreator);
+		List<Product> adminProducts = null;
+		try {
+			adminProducts = prodService.findProductsByCreatorId(idcreator);
+		} catch (ProductException e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 		
 		// retrieve all the product days
 		// mapping each product with its integer id and its date in which it is product of the day
 		Map<Integer, Date> productDays = new HashMap<>();
 		for(Product p: adminProducts) {
-			System.out.println(p.getIdproduct());
-			System.out.println(p.getQuestionnaire().getIdquestionnaire());
 			Date date = p.getQuestionnaire().getDate();
 			productDays.put(p.getIdproduct(), date);
 		}
