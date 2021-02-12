@@ -73,15 +73,22 @@ public class CheckLogin extends HttpServlet {
 		// show login page with error message
 
 		String path;
-		if (user == null) {
+		if (user == null || user.isBlocked() == true) {
 			ServletContext servletContext = getServletContext();
 			path = "/index.html";
 			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 			if (usrn.isEmpty() || pwd.isEmpty()) { //usrn o pwd non compilati
 				ctx.setVariable("errorMsg", "Username or password are empty, please retry");
-			} else { //usrn o pwd non corretti
+			} 
+			if(!usrn.isEmpty() || !pwd.isEmpty()){
+				//usrn o pwd non corretti
 				ctx.setVariable("errorMsg", "Username or password are not correct");
 			}
+			
+			if(user.isBlocked() == true) {
+				ctx.setVariable("errorMsg", "You are permanently blocked. Access denied.");
+			}
+			
 			templateEngine.process(path, ctx, response.getWriter());
 		} else {
 			/*

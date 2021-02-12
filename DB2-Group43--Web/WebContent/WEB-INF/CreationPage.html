@@ -5,10 +5,13 @@
 <!-- <script src="/DB2-Group43--Web/scripts/creationForm.js" charset="utf-8" defer></script> -->
 <meta charset="ISO-8859-1">
 <title>Creation page</title>
+<link rel="stylesheet" type="text/css" href="../css/creationPage.css">
 </head>
 <body>
-	<h1>Creation page</h1>
-	
+	<div class="topnav">
+		<b class="paragraph"><span th:text="${session.user.getUsername()}"></span></b>
+		<a th:href="@{/Logout}" class="active">Logout</a> 
+</div>	
 	<!-- <h3>Welcome back <span th:text="${session.user.name}">mockup</span>! </h3> -->
 
 	<form th:action="@{/Admin/NewProduct}" method="POST">
@@ -16,13 +19,13 @@
 			Name of the product: <input name="productName" type="text" placeholder="Insert the name of the product here ..." required><br>
 			Product day: <input name="productDay" type="date" min="${#dates.createNowForTimeZone()}" required><br>
 			<!--  TODO: set jpg, png as allowed files -->
-			Insert image URL of the product: <input name="urlImg" type="text" required><br>
+			Insert image URL of the product: <input name="urlImg" type="text" required  placeholder="URL"><br>
 			Number of marketing questions: <input type="number" name="numQuest" id="numberQuest" value=1 min=1 required>
 			<fieldset id="marketingQuestions">
 			<!-- link between numbers and number of questions is implemented by JS -->
 			<span>Marketing questions:<br></span>
 			</fieldset>
-			<input type="submit" value="submit">
+			<input type="submit" value="Submit">
 		</fieldset>
 	</form>
 

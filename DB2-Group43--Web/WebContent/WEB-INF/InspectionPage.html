@@ -4,17 +4,22 @@
 <!-- add js to show and hide the lists with a short animation -->
 <meta charset="ISO-8859-1">
 <title>Inspection page</title>
+<link rel="stylesheet" type="text/css" href="../css/inspectionPage.css">
 </head>
 <body>
-	<h1>Inspection page</h1>
 	
-	<a th:href="@{/Admin/GoToHomepage}">Back to homepage</a> <br>
+<div class="topnav">
+		<b class="paragraph">Inspection Page <span th:text="${session.user.getUsername()}"></span></b>
+		<a th:href="@{/Logout}" class="active">Logout</a>
+	   <a th:href="@{/Admin/GoToHomepage}">HomePage</a> 
+</div>	
+ 
 	
-	<h3>Inspection page for product: <span th:text="${product.name}">Product Name</span></h3>
+	<h3 class="text" style="margin-left: 3%">Inspection page for product: <span th:text="${product.name}" class="text" >Product Name</span></h3>
 	
 	<!-- Print completed usernames list -->
-	<div>
-		<div th:if="${not #lists.isEmpty(completedUsernames)}">
+	<div class ="genericTable1">
+		<div th:if="${not #lists.isEmpty(completedUsernames)}" >
 			<h4>Click to see the list of users who submitted the questionnaire</h4>
 			<table border="1" style="margin-left: 5%">
 				<thead>
@@ -35,8 +40,8 @@
 	</div>
 	
 	<!-- Print cancelled usernames list -->
-	<div>
-		<div th:if="${not #lists.isEmpty(cancelledUsernames)}">
+	<div class ="genericTable1">
+		<div th:if="${not #lists.isEmpty(cancelledUsernames)}" >
 			<h4>Click to see the list of users who cancelled the respones to the questionnaire</h4>
 			<table border="1" style="margin-left: 5%">
 				<thead>
@@ -57,7 +62,7 @@
 	</div>
 	
 	<!-- Print questionnaire answers -->
-	<div th:if="${not #lists.isEmpty(completedUsernames)}">
+	<div th:if="${not #lists.isEmpty(completedUsernames)}" class ="genericTable">
 	<h4>Click to see the answers to the questions</h4>
 	<table border="1" style="margin-left: 5%">
 		<thead>
