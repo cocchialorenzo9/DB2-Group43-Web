@@ -142,10 +142,7 @@ public class NewProduct extends HttpServlet {
 			}
 		}
 		
-		
-		
-		
-		
+		// error checking
 		if(error) {
 			errString += " >> try again.";
 			// response.sendError(HttpServletResponse.SC_BAD_REQUEST, errString + ">> go back and correct the data");
@@ -166,9 +163,12 @@ public class NewProduct extends HttpServlet {
 
 		java.sql.Date sqlDate = new java.sql.Date(date.getTime());
 		
+		// name, urlImage -> new product
+		// sqlDate, idadmin -> questionnaire
+		// marketingQuestions -> questions
+		
 		Product newProduct = prodService.newProduct(name, urlImage);
-		// Product newProduct = new Product(name, urlImage);
-		Questionnaire questionnaire = questService.newQuestionnaire(sqlDate, idadmin, newProduct);
+		Questionnaire questionnaire = questService.newQuestionnaire(sqlDate, idadmin, newProduct.getIdproduct());
 		questionService.newQuestions(questionnaire, marketingQuestions);
 		
 		// redirect to ok message, or little AJAX call?
