@@ -12,7 +12,7 @@
 	   <a th:href=@{/User/CheckQuestionnaireInteraction}>Questionnaire</a>
 	   <a th:href="@{/GoToUserHomePage}">HomePage</a>  
 </div>	
-<div class= "center" th:if="${#lists.isEmpty(questionnaireInteractions)}"> <h2 class = "text"> Questionnaire of the day was not created yet</h2></div>
+<div class= "center" th:if="${#lists.isEmpty(questionnaireInteractions)}"> <h2 class = "text"> No one answers the questionnaire of the day yet, try again later.</h2></div>
 
 <div class= "center" th:if="${ not #lists.isEmpty(questionnaireInteractions)}">
 	

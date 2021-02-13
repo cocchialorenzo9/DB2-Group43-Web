@@ -32,8 +32,8 @@ public class GetQuestionnaire extends HttpServlet {
 	private QuestionnaireService qService;
 	@EJB(name = "group43.services/QuestionService")
 	private QuestionService questService;
-	@EJB(name = "group43.services/InteractionService")
-	private InteractionService iService;
+	@EJB(name = "group43.services/QuestionnaireInteractionService")
+	private QuestionnaireInteractionService iService;
        
 
     public GetQuestionnaire() {
@@ -136,6 +136,8 @@ public class GetQuestionnaire extends HttpServlet {
 		// If no interaction is present, then add an interaction
 		if(interaction == null)
 			iService.insertInteraction(userId, questionnaireId);
+		else // otherwise update the interaction
+			iService.UpdateInteraction(interaction.getIdquestionnaire_interaction());
 		
 		return true;
 	}

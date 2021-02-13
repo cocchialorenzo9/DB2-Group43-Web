@@ -21,8 +21,8 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import group43.services.*;
 import group43.entities.*;
 
-@WebServlet("/User/AnswerQuestions")
-public class AnswerQuestions extends HttpServlet {
+@WebServlet("/User/InsertAnswers")
+public class InsertAnswers extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	
@@ -30,15 +30,15 @@ public class AnswerQuestions extends HttpServlet {
 	private QuestionService questService;
 	@EJB(name = "group43.services/AnswerService")
 	private AnswerService aService;
-	@EJB(name = "group43.services/InteractionService")
-	private InteractionService iService;
+	@EJB(name = "group43.services/QuestionnaireInteractionService")
+	private QuestionnaireInteractionService iService;
 	@EJB(name = "group43.services/OffensiveWordService")
 	private OffensiveWordService wordsService;
 	@EJB(name = "group43.services/UserService")
 	private UserService userService;
 	
        
-    public AnswerQuestions() {
+    public InsertAnswers() {
         super();
     } 
     
@@ -71,9 +71,10 @@ public class AnswerQuestions extends HttpServlet {
 		}
 		
 		// Retrieve the first index of the questionsList to start the iteration correctly
-		Integer firstIndex = null;
+		Integer firstQuestionId = null;
 		try {
-			firstIndex = Integer.parseInt(request.getParameter("firstIndex"));
+			firstQuestionId = Integer.parseInt(request.getParameter("firstIndex"));
+			System.out.println(firstQuestionId);
 		} catch (NumberFormatException | NullPointerException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> first Index");
 			return;
@@ -107,7 +108,7 @@ public class AnswerQuestions extends HttpServlet {
 		// a boolean to know whether the user has to be blocked or not
 		List<String> answers = new ArrayList<String>();
 		try {
-			toBeBlocked = processingMarketingSection(request, response, firstIndex, questionsNumber, word_list, answers);
+			toBeBlocked = processingMarketingSection(request, response, firstQuestionId, questionsNumber, word_list, answers);
 		} catch(IOException e) {
 			 e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error in processing the Marketing Session");
@@ -119,6 +120,7 @@ public class AnswerQuestions extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Wrong number of answers respect to the number of question in the questionnaire");
 			return;
 		}
+		
 		
 		//If the user must be blocked because he used some of the offensive words in the list
 		if(toBeBlocked) {
@@ -146,51 +148,33 @@ public class AnswerQuestions extends HttpServlet {
 		Integer age = null;
 		String explevel = null;
 		try {
-			processingStatisticalSection(request, response, sex, age, explevel);
-		} catch(IOException e) {
+			sex = StringEscapeUtils.escapeJava(request.getParameter("sex"));
+			age = Integer.parseInt(request.getParameter("age"));
+			explevel = StringEscapeUtils.escapeJava(request.getParameter("explevel"));
+		} catch(NullPointerException e) {
 			 e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error in processing the Statistical Session");
 			return;
 		}
-			
-		// Searching for the last interaction of the user with the questionnaire of the day
-		QuestionnaireInteraction interaction = null;
-		try {
-			interaction = iService.findLastInteraction(user.getIduser(), questionnaireId);
-			if(interaction == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to retrieve the last interaction of the user");
+		
+		
+		
+		for(Integer i = 0; i < answers.size(); i++) {	
+			System.out.println("INSERTING from servlet: " + answers.get(i) + " con id = " + firstQuestionId);
+			try {
+				aService.insertAnswer(user.getIduser(), answers.get(i), firstQuestionId);
+			} catch (Exception e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to insert the Marketing section answers");
 				return;
-			}	
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to retrieve the last interaction of the user");
-			return;
-		}
-
-		// If no problems occurs, then answers of the marketing section can be added to the database
-		if(!insertingMarketingAnswers(firstIndex,  questionsNumber, user.getIduser(), answers)) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to insert the Marketing section answers");
-			return;
+			}
+			
+			firstQuestionId++;
 		}
 		
-		// Now update the interaction, setting the completed values and the answers of the statistical section
 		try {
-			
-			// Since the answers are not mandatory, checking the nullness of the fized inputs answers
-			if(age != null)
-				interaction.setAge(age);
-			if(explevel != null)
-				interaction.setExpertise_level(explevel);
-			if(sex != null)
-				interaction.setSex(sex);
-			
-			interaction.setCompleted(true);
-			iService.updateStatisticalSection(interaction);
-		} 
-		catch(Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in inserting statistical section answers");
-			interaction.setAge(0);
-			interaction.setExpertise_level(null);
-			interaction.setSex(null);
+			iService.updateStatisticalSection(user.getIduser(), questionnaireId, age, sex, explevel);
+		} catch (Exception e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to update the last interaction of the user");
 			return;
 		}
 			
@@ -220,12 +204,12 @@ public class AnswerQuestions extends HttpServlet {
 	
 	// This method processes the Marketing Section answers by retrieving the request parameters and checking
 	// for the use of offensive Words
-	public boolean processingMarketingSection(HttpServletRequest request, HttpServletResponse response, int firstIndex, int questionsNumber, List<OffensiveWord> word_list, List<String> answers) throws IOException {
+	public boolean processingMarketingSection(HttpServletRequest request, HttpServletResponse response, int firstQuestionId, int questionsNumber, List<OffensiveWord> word_list, List<String> answers) throws IOException {
 		String answerBody = null;
 		boolean toBeBlocked = false;
 		boolean invalidAnswers = false;
 		
-		for( Integer i = firstIndex; i <= questionsNumber && !toBeBlocked; i++) {				
+		for( Integer i = firstQuestionId; i < firstQuestionId + questionsNumber && !toBeBlocked; i++) {				
 			try {	
 				answerBody = StringEscapeUtils.escapeJava(request.getParameter(i.toString()));
 					
@@ -235,7 +219,8 @@ public class AnswerQuestions extends HttpServlet {
 				
 				if(!toBeBlocked)
 					toBeBlocked = checkForOffensiveWords(answerBody, word_list);
-					
+				
+				System.out.println("ANSWER " + i + " is : " + answerBody);
 				answers.add(answerBody);
 					
 			} catch (NumberFormatException | NullPointerException e) {
@@ -248,58 +233,10 @@ public class AnswerQuestions extends HttpServlet {
 		return toBeBlocked;
 	}
 	
-	// This method processes the Statistical Section answers by retrieving the request parameters 
-	public void processingStatisticalSection(HttpServletRequest request, HttpServletResponse response, String sex, Integer age, String explevel) throws IOException {
-
-		try {
-			sex = StringEscapeUtils.escapeJava(request.getParameter("sex"));
-		} catch (NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> sex");
-			return ;
-		}
-		
-
-		try {
-			age = Integer.parseInt(request.getParameter("age"));
-		} catch (NumberFormatException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> age");
-			return ;
-		}
-		
-
-		try {
-			explevel = StringEscapeUtils.escapeJava(request.getParameter("explevel"));
-		} catch (NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> exp level");
-			return ;
-		}
-		
-		return ;
-	}
-	
-	// This method inserts in the db the Marketing questions answers
-	public boolean insertingMarketingAnswers(int firstIndex, int questionsNumber, int userId, List<String> answers) {
-		int j = 0;
-		
-		for( Integer i = firstIndex; i <= questionsNumber; i++) {	
-			
-			try {
-				aService.insertAnswer(userId, answers.get(j), i);
-			} catch (Exception e) {
-				return false;
-			}
-			
-			j++;
-		}
-		
-		return true;
-	}
-	
 	// This method checks for the user of an offensive word in a single text string (an answer body)
 	public boolean checkForOffensiveWords(String text, List<OffensiveWord> word_list) {
 		
-		for(int i=0 ; i< word_list.size(); i++) {
-			System.out.println(text + " " + word_list.get(i).getWord());
+		for(int i=0 ; i < word_list.size(); i++) {
 			if (text.contains(word_list.get(i).getWord()))
 				return true;
 		}

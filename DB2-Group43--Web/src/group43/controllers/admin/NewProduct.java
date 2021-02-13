@@ -136,6 +136,7 @@ public class NewProduct extends HttpServlet {
 			}
 			
 			// call service to check if there is another product date
+			System.out.println(new java.sql.Date(date.getTime()));
 			if(questService.isAlreadyDayOfAnotherQuestionnaire(new java.sql.Date(date.getTime()))) {
 				errString += "there is already another product with that date";
 				error = true;

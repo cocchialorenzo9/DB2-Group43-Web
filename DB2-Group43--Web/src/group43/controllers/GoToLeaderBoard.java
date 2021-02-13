@@ -66,7 +66,6 @@ public class GoToLeaderBoard extends HttpServlet {
 				List<QuestionnaireInteraction> qI;
 				
 				try {
-					// query db to authenticate for user
 					qI = qIS.findInteractionOfTheDay();
 				} catch (QuestionnaireInteractionException e) {
 					e.printStackTrace();

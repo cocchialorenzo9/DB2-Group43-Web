@@ -19,7 +19,7 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import group43.entities.Questionnaire;
 import group43.entities.QuestionnaireInteraction;
 import group43.entities.User;
-import group43.services.InteractionService;
+import group43.services.QuestionnaireInteractionService;
 import group43.services.QuestionnaireService;
 
 /**
@@ -32,8 +32,8 @@ public class CheckQuestionnaireInteraction extends HttpServlet {
 
 	@EJB(name = "group43.services/QuestionnaireService")
 	private QuestionnaireService qService;
-	@EJB(name = "group43.services/InteractionService")
-	private InteractionService iService;
+	@EJB(name = "group43.services/QuestionnaireInteractionService")
+	private QuestionnaireInteractionService iService;
 
 	
     public CheckQuestionnaireInteraction() {
@@ -53,10 +53,6 @@ public class CheckQuestionnaireInteraction extends HttpServlet {
 		// If the user is not logged in (not present in session) redirect to the login
 		String loginpath = getServletContext().getContextPath() + "/index.html";
 		HttpSession session = request.getSession();
-		if (session.isNew() || session.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
-			return;
-		}
 		
 		// Retrieve the user through the Session
 		User user = (User) session.getAttribute("user");

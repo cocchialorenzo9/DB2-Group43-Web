@@ -11,7 +11,6 @@
 	<div class="topnav">
 		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
 		<a th:href="@{/Logout}" class="active">Logout</a>
-	   <a th:href="@{/User/CheckQuestionnaireInteraction}">Questionnaire</a>
 	   <a th:href="@{/GoToLeaderBoard}">LeaderBoard</a>
 	   <a th:href="@{/GoToUserHomePage}">HomePage</a>    
 	</div>	
@@ -24,76 +23,76 @@
 	<div th:if="${product != null}">
 		<h2 style = "text-align: center " class = "text" th:text="${product.getName() + ' is the product of the day'}"></h2>
 		<img th:src="@{${product.getImage()}}" class = "image" />
-	</div>
 
 
 
-	<!--  displaying questionnaire -->
-	<div th:if="${questionErrorMsg != null}">
-	 	<h2 class="text" style = "margin-left: 5% "th:text = "${questionErrorMsg}"></h2>
-	</div>
-	
-	
-	<div th:if="${questionErrorMsg == null}">	
-		<form action="#" th:action="@{/User/AnswerQuestions}" method="POST">
-			
-			<!--  displaying marketing questions first -->
-			<div class="section" id="marketing_section">
-				<h3>First section: Marketing questions</h3>
-				<p>Please provide an answer to all the questions below. This section is mandatory.</p>
-					
-				<fieldset>
-					<div th:each="q : ${questions}">
-						<p th:text="${q.numberQuestion + '. ' + q.text}"></p>
-						<input type="text" th:name="${q.idquestion}" class="questionInput" required />
-					</div>
+		<!--  displaying questionnaire -->
+		<div th:if="${questionErrorMsg != null}">
+		 	<h2 class="text" style = "margin-left: 5% "th:text = "${questionErrorMsg}"></h2>
+		</div>
+		
+		
+		<div th:if="${questionErrorMsg == null}">	
+			<form action="#" th:action="@{/User/InsertAnswers}" method="POST">
+				
+				<!--  displaying marketing questions first -->
+				<div class="section" id="marketing_section">
+					<h3>First section: Marketing questions</h3>
+					<p>Please provide an answer to all the questions below. This section is mandatory.</p>
 						
-					<!-- Mi passo come hidden values il numero di domande e il primo ID delle domande -->
-					<input type="hidden" th:value="${questionsNumber}" name="questionsNumber" />
-					<input type="hidden" th:value="${firstIndex}" name="firstIndex" />
-				</fieldset>
-					
-				<button type="button" th:onclick="ValidateMarketingSection()">Next</button>
-			</div>
-			
-			<!--  displaying statistical questions seconds -->
-			<div class="section" id="statistical_section">
-				<h3>Second section: Statistical questions</h3>
-				<p>Answer carefully, you will get a point for each question answered! </p>
+					<fieldset>
+						<div th:each="q : ${questions}">
+							<p th:text="${q.numberQuestion + '. ' + q.text}"></p>
+							<input type="text" th:name="${q.idquestion}" class="questionInput" required />
+						</div>
+							
+						<!-- Mi passo come hidden values il numero di domande e il primo ID delle domande -->
+						<input type="hidden" th:value="${questionsNumber}" name="questionsNumber" />
+						<input type="hidden" th:value="${firstIndex}" name="firstIndex" />
+					</fieldset>
+						
+					<button type="button" th:onclick="ValidateMarketingSection()">Next</button>
+				</div>
 				
-				<fieldset>
-					<p>Specify your gender:</p>
-					<input type="radio" id="male" name="sex" value="male">
-					<label for="male">Male</label><br>
-					<input type="radio" id="female" name="sex" value="female">
-					<label for="female">Female</label><br>
-					<input type="radio" id="other" name="sex" value="other">
-					<label for="other">Other</label>
+				<!--  displaying statistical questions seconds -->
+				<div class="section" id="statistical_section">
+					<h3>Second section: Statistical questions</h3>
+					<p>Answer carefully, you will get a point for each question answered! </p>
 					
-					<p>Specify your age:</p>
-					<select name="age" th:field="*{percentage}">
-		    			<option th:each="i : ${#numbers.sequence(0, 100)}" th:value="${i}" th:text="${i}">
-		    			</option>
-					</select>
+					<fieldset>
+						<p>Specify your gender:</p>
+						<input type="radio" id="male" name="sex" value="male">
+						<label for="male">Male</label><br>
+						<input type="radio" id="female" name="sex" value="female">
+						<label for="female">Female</label><br>
+						<input type="radio" id="other" name="sex" value="other">
+						<label for="other">Other</label>
+						
+						<p>Specify your age:</p>
+						<select name="age" th:field="*{percentage}">
+			    			<option th:each="i : ${#numbers.sequence(0, 100)}" th:value="${i}" th:text="${i}">
+			    			</option>
+						</select>
+						
+						<p>Specify your expertiseLevel:</p>
+						<input type="radio" id="low" name="explevel" value="low">
+						<label for="male">Low</label><br>
+						<input type="radio" id="medium" name="explevel" value="medium">
+						<label for="female">Medium</label><br>
+						<input type="radio" id="high" name="explevel" value="high">
+						<label for="other">High</label>
+						
+					</fieldset>
+					<input type="hidden" th:value="${questionnaireId}" name="questionnaireId"/>
 					
-					<p>Specify your expertiseLevel:</p>
-					<input type="radio" id="low" name="explevel" value="low">
-					<label for="male">Low</label><br>
-					<input type="radio" id="medium" name="explevel" value="medium">
-					<label for="female">Medium</label><br>
-					<input type="radio" id="high" name="explevel" value="high">
-					<label for="other">High</label>
-					
-				</fieldset>
-				<input type="hidden" th:value="${questionnaireId}" name="questionnaireId"/>
-				
-				<span><button type="button" th:onclick="showMarketing()">Previous</button></span>
-				<span><a class="fakeButton" th:href="@{/GoToUserHomePage}">Cancel</a> </span>
-				<span><input type="submit" name="Submit"></span>
-
-			</div>
-		</form>
-	</div>	
+					<span><button type="button" th:onclick="showMarketing()">Previous</button></span>
+					<span><a class="fakeButton" th:href="@{/GoToUserHomePage}">Cancel</a> </span>
+					<span><input type="submit" name="Submit"></span>
+	
+				</div>
+			</form>
+		</div>	
+	</div>
 	
 	<script>
 		function showMarketing() {
