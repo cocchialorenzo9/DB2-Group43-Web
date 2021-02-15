@@ -27,7 +27,7 @@ form {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 50%;
+  max-width: 30%;
 }
 /* Full-width inputs */
 input[type=text], input[type=password] {

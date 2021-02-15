@@ -42,7 +42,7 @@
 						
 					<fieldset>
 						<div th:each="q : ${questions}">
-							<p th:text="${q.numberQuestion + '. ' + q.text}"></p>
+							<p th:text="${q.text}"></p>
 							<input type="text" th:name="${q.idquestion}" class="questionInput" required />
 						</div>
 							

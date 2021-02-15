@@ -17,6 +17,10 @@
         <filter-name>User</filter-name>
         <filter-class>group43.filters.UserFilter</filter-class>
   </filter>
+  <filter>
+        <filter-name>Blocked</filter-name>
+        <filter-class>group43.filters.BlockedFilter</filter-class>
+  </filter>
   
   <filter-mapping>
 	  <filter-name>Session</filter-name>
@@ -29,6 +33,10 @@
   </filter-mapping>
   <filter-mapping>
 	  <filter-name>User</filter-name>
+	  <url-pattern>/User/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+	  <filter-name>Blocked</filter-name>
 	  <url-pattern>/User/*</url-pattern>
   </filter-mapping>
 </web-app>

@@ -50,8 +50,7 @@ public class CheckQuestionnaireInteraction extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// If the user is not logged in (not present in session) redirect to the login
-		String loginpath = getServletContext().getContextPath() + "/index.html";
+
 		HttpSession session = request.getSession();
 		
 		// Retrieve the user through the Session
@@ -73,7 +72,7 @@ public class CheckQuestionnaireInteraction extends HttpServlet {
 					// to check whether he already filled up a questionnaire or not
 					interaction = iService.findLastInteraction(user.getIduser(), questionnaireId);
 				} catch (Exception e) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in searching fot the last interaction of the user");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in searching for the last interaction of the user");
 					return;
 				}
 			}

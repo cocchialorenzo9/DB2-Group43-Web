@@ -74,27 +74,23 @@ public class GetQuestionnaire extends HttpServlet {
 		// Getting questionnaire of the Day
 		try {
 			questionnaireOfTheDay = qService.findQuestionnaireOfTheDay();
-			if (questionnaireOfTheDay == null) {
+			
+			if (questionnaireOfTheDay == null) 
 				productErrorMsg = "No Questionnaire is available for today, try again tomorrow";
-			}
-			else { // If the is a questionnaire of the day
+			else { 
+				// If the is a questionnaire of the day
 				questionnaireId = questionnaireOfTheDay.getIdquestionnaire();
 				// getting the product of the day
 				product = questionnaireOfTheDay.getProduct();
-				
-				// getting questionnaire's questions
-				try {
-					questions = questService.findQuestionsByQuestionnaireId(questionnaireOfTheDay.getIdquestionnaire());
-					if (questions == null || questions.isEmpty())
-						questionErrorMsg = "No questions available for the questionnaire of the day. Sorry";
-					else 
-					{
-						questionsNumber = questions.size();
-						firstIndex = questions.get(0).getIdquestion();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return;
+				// getting the questions of the questionnaire of the day
+				questions = questionnaireOfTheDay.getQuestions();
+
+				if (questions == null || questions.isEmpty())
+					questionErrorMsg = "No questions available for the questionnaire of the day. Sorry";
+				else {
+					// getting useful parameters for answering settings
+					questionsNumber = questions.size();
+					firstIndex = questions.get(0).getIdquestion();
 				}
 					
 				// Handling interaction and time stamp insertion or updating

@@ -61,31 +61,18 @@ public class InsertAnswers extends HttpServlet {
 		// Retrieve the user from the Session
 		User user = (User) session.getAttribute("user");
 		
-		// Retrieve the number of questions answered from the request
+		// The number of questions answered by the user
 		Integer questionsNumber = null;
-		try {
-			questionsNumber = Integer.parseInt(request.getParameter("questionsNumber"));
-		} catch (NumberFormatException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> questionsNumber");
-			return;
-		}
-		
-		// Retrieve the first index of the questionsList to start the iteration correctly
+		// The first index of the questionsList to start the iteration correctly
 		Integer firstQuestionId = null;
-		try {
-			firstQuestionId = Integer.parseInt(request.getParameter("firstIndex"));
-			System.out.println(firstQuestionId);
-		} catch (NumberFormatException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> first Index");
-			return;
-		}
-		
-		// Retrieve the questionnaireId
+		// The questionnaireId
 		Integer questionnaireId = null;
 		try {
+			questionsNumber = Integer.parseInt(request.getParameter("questionsNumber"));
+			firstQuestionId = Integer.parseInt(request.getParameter("firstIndex"));
 			questionnaireId = Integer.parseInt(request.getParameter("questionnaireId"));
 		} catch (NumberFormatException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values -> questionnare id");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect param values regarding Marketing Questions");
 			return;
 		}
 		
@@ -93,12 +80,13 @@ public class InsertAnswers extends HttpServlet {
 		List<OffensiveWord> word_list = null;
 		try {
 			word_list = wordsService.findAllOffensiveWords();
-			if(word_list == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No Offensive word in the database");
-				return;
-			}
 		} catch (Exception e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in checking for offensive words");
+			return;
+		}
+		
+		if(word_list == null) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No Offensive word in the database");
 			return;
 		}
 		
@@ -110,17 +98,9 @@ public class InsertAnswers extends HttpServlet {
 		try {
 			toBeBlocked = processingMarketingSection(request, response, firstQuestionId, questionsNumber, word_list, answers);
 		} catch(IOException e) {
-			 e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error in processing the Marketing Session");
 			return;
 		}
-		
-		// Checking if the number of answers is equals to the number of questions presents in the questionnaire
-		if(!CorrectNumberOfAnswer(questionsNumber, questionnaireId)) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Wrong number of answers respect to the number of question in the questionnaire");
-			return;
-		}
-		
 		
 		//If the user must be blocked because he used some of the offensive words in the list
 		if(toBeBlocked) {
@@ -134,15 +114,17 @@ public class InsertAnswers extends HttpServlet {
 				user.setBlocked(false);
 				return;
 			}
-			
-			// Redirecting to BlockedPage.html
-			System.out.println("Bloccato");
-			String ctxpath = getServletContext().getContextPath();
-			String path = ctxpath + "/User/GetBlockedPage";
-			response.sendRedirect(path);
-			return ;
 
 		}
+		
+		// Checking if the number of answers is equals to the number of questions presents in the questionnaire
+		if(!CorrectNumberOfAnswer(questionsNumber, questionnaireId)) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Wrong number of answers respect to the number of question in the questionnaire");
+			return;
+		}
+		
+		
+		// STARTING TO PROCESS THE STATISTICAL SECTION OF THE QUESTIONNAIRE
 		
 		String sex = null;
 		Integer age = null;
@@ -158,19 +140,20 @@ public class InsertAnswers extends HttpServlet {
 		}
 		
 		
-		
+		// IF all went wrong, Answers to the Marketing section can be inserted
 		for(Integer i = 0; i < answers.size(); i++) {	
-			System.out.println("INSERTING from servlet: " + answers.get(i) + " con id = " + firstQuestionId);
 			try {
 				aService.insertAnswer(user.getIduser(), answers.get(i), firstQuestionId);
 			} catch (Exception e) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to insert the Marketing section answers");
 				return;
 			}
-			
+			//updating the questionId correlated to the answer to be inserted
 			firstQuestionId++;
 		}
 		
+		// Then also answers to the Statistical Section can be inserted: in this case the operation required is the 
+		// updating of the corresponding questionnaireInteraction
 		try {
 			iService.updateStatisticalSection(user.getIduser(), questionnaireId, age, sex, explevel);
 		} catch (Exception e) {
@@ -185,6 +168,8 @@ public class InsertAnswers extends HttpServlet {
 		return ;
 	}
 
+	//This method checks the consistency of the number of questions in the questionnaire 
+	//and the number of questions answered by the user
 	public boolean CorrectNumberOfAnswer(int questionsNumber, int questionnaireId) {
 		Integer count = 0;
 		
@@ -220,7 +205,7 @@ public class InsertAnswers extends HttpServlet {
 				if(!toBeBlocked)
 					toBeBlocked = checkForOffensiveWords(answerBody, word_list);
 				
-				System.out.println("ANSWER " + i + " is : " + answerBody);
+				// if the answer is valid then is added to the answer list
 				answers.add(answerBody);
 					
 			} catch (NumberFormatException | NullPointerException e) {
@@ -237,7 +222,7 @@ public class InsertAnswers extends HttpServlet {
 	public boolean checkForOffensiveWords(String text, List<OffensiveWord> word_list) {
 		
 		for(int i=0 ; i < word_list.size(); i++) {
-			if (text.contains(word_list.get(i).getWord()))
+			if (text.toLowerCase().contains(word_list.get(i).getWord()))
 				return true;
 		}
 		
