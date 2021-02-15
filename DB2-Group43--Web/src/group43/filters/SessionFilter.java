@@ -35,6 +35,7 @@ public class SessionFilter implements Filter {
 			System.out.println("This request had no valid session, redirecting...");
 			res.sendRedirect(loginpath);
 		} else {
+			System.out.println("Request received, session is ok...");
 			chain.doFilter(request, response);
 		}
 	}

@@ -112,7 +112,7 @@ public class CheckLogin extends HttpServlet {
 			response.sendRedirect(path);
 			*/
 			request.getSession().setAttribute("user", user);
-			String target = (user.getRole().toString().equals("user")) ? "/GoToUserHomePage" : "/Admin/GoToHomepage";
+			String target = (user.getRole().toString().equals("user")) ? "/User/GoToUserHomePage" : "/Admin/GoToHomepage";
 			path = getServletContext().getContextPath() + target;
 			response.sendRedirect(path);
 		}

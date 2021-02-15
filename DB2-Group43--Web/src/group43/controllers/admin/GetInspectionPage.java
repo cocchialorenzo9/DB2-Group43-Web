@@ -19,6 +19,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import group43.entities.*;
+import group43.exceptions.AnswersException;
+import group43.exceptions.QuestionnaireInteractionException;
 import group43.services.*;
 import group43.utils.AnswersBean;
 
@@ -86,7 +88,13 @@ public class GetInspectionPage extends HttpServlet {
 		List<String> cancelledUsernames = new ArrayList<>();
 		List<AnswersBean> allAnswers = new ArrayList<>();
 		
-		List<QuestionnaireInteraction> allQIs = interactionsService.findInteractionsByQuestionnaireId(prodToInspect.getQuestionnaire().getIdquestionnaire());
+		List<QuestionnaireInteraction> allQIs;
+		try {
+			allQIs = interactionsService.findInteractionsByQuestionnaireId(prodToInspect.getQuestionnaire().getIdquestionnaire());
+		} catch (QuestionnaireInteractionException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			return;
+		}
 		
 		for(QuestionnaireInteraction interaction : allQIs) {
 			String username = interaction.getUser().getUsername();
@@ -99,7 +107,13 @@ public class GetInspectionPage extends HttpServlet {
 			}
 		}
 		
-		List<Answer> answers = ansService.findAnswersByQuestionnaireId(questionnaireToInspect.getIdquestionnaire());
+		List<Answer> answers = null;
+		try {
+			answers = ansService.findAnswersByQuestionnaireId(questionnaireToInspect.getIdquestionnaire());
+		} catch (AnswersException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			return;
+		}
 		
 		System.out.println("Num answers: " + answers.size());
 		

@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import group43.entities.Product;
 import group43.entities.Questionnaire;
 import group43.entities.User;
+import group43.exceptions.QuestionnaireException;
 import group43.services.ProductService;
 import group43.services.QuestionService;
 import group43.services.QuestionnaireService;
@@ -137,9 +138,14 @@ public class NewProduct extends HttpServlet {
 			
 			// call service to check if there is another product date
 			System.out.println(new java.sql.Date(date.getTime()));
-			if(questService.isAlreadyDayOfAnotherQuestionnaire(new java.sql.Date(date.getTime()))) {
-				errString += "there is already another product with that date";
+			try {
+				if(questService.isAlreadyDayOfAnotherQuestionnaire(new java.sql.Date(date.getTime()))) {
+					errString += "there is already another product with that date";
+					error = true;
+				}
+			} catch (QuestionnaireException e) {
 				error = true;
+				errString += e.getMessage();
 			}
 		}
 		

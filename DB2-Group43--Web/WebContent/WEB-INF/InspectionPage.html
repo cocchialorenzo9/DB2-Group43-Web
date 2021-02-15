@@ -20,7 +20,7 @@
 	<!-- Print completed usernames list -->
 	<div class ="genericTable1">
 		<div th:if="${not #lists.isEmpty(completedUsernames)}" >
-			<h4>Click to see the list of users who submitted the questionnaire</h4>
+			<h4>Users who submitted the questionnaire</h4>
 			<table border="1" style="margin-left: 5%">
 				<thead>
 					<tr>
@@ -42,7 +42,7 @@
 	<!-- Print cancelled usernames list -->
 	<div class ="genericTable1">
 		<div th:if="${not #lists.isEmpty(cancelledUsernames)}" >
-			<h4>Click to see the list of users who cancelled the respones to the questionnaire</h4>
+			<h4>Users who cancelled the respones to the questionnaire</h4>
 			<table border="1" style="margin-left: 5%">
 				<thead>
 					<tr>
@@ -63,7 +63,7 @@
 	
 	<!-- Print questionnaire answers -->
 	<div th:if="${not #lists.isEmpty(completedUsernames)}" class ="genericTable">
-	<h4>Click to see the answers to the questions</h4>
+	<h4>Answers to the questions</h4>
 	<table border="1" style="margin-left: 5%">
 		<thead>
 			<tr>

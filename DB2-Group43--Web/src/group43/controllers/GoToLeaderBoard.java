@@ -26,7 +26,7 @@ import group43.services.QuestionnaireInteractionService;
 /**
  * Servlet implementation class GoToLeaderBoard
  */
-@WebServlet("/GoToLeaderBoard")
+@WebServlet("/User/GoToLeaderBoard")
 public class GoToLeaderBoard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
@@ -54,31 +54,22 @@ public class GoToLeaderBoard extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	
-		// If the user is not logged in (not present in session) redirect to the login
-				String loginpath = getServletContext().getContextPath() + "/index.html";
-				HttpSession session = request.getSession();
-				if (session.isNew() || session.getAttribute("user") == null) {
-					response.sendRedirect(loginpath);
-					return;
-				}
-				
-				List<QuestionnaireInteraction> qI;
-				
-				try {
-					qI = qIS.findInteractionOfTheDay();
-				} catch (QuestionnaireInteractionException e) {
-					e.printStackTrace();
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Could not verify questionnaire interaction");
-					return;
-				}
-				
-				
-				String path = "/WEB-INF/LeaderBoard.html";
-				ServletContext servletContext = getServletContext();
-				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-				ctx.setVariable("questionnaireInteractions", qI);
-				templateEngine.process(path, ctx, response.getWriter());
+		List<QuestionnaireInteraction> qI;
+		
+		try {
+			qI = qIS.findInteractionOfTheDay();
+		} catch (QuestionnaireInteractionException e) {
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Could not verify questionnaire interaction");
+			return;
+		}
+		
+		
+		String path = "/WEB-INF/LeaderBoard.html";
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("questionnaireInteractions", qI);
+		templateEngine.process(path, ctx, response.getWriter());
     }
 
 	/**

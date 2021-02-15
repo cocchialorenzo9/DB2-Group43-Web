@@ -3,14 +3,14 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>UserHomePage</title>
-<link rel="stylesheet" type="text/css" href="css/userHomePage.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/userHomePage.css}">
 </head>
 
 <div class="topnav">
 		<b class="paragraph">Welcome <span th:text="${session.user.getUsername()}"></span></b>
 		<a th:href="@{/Logout}" class="active">Logout</a>
 	   <a th:href="@{/User/CheckQuestionnaireInteraction}">Questionnaire</a>
-	   <a th:href="@{/GoToLeaderBoard}">LeaderBoard</a>  
+	   <a th:href="@{/User/GoToLeaderBoard}">LeaderBoard</a>  
 </div>	
  
 

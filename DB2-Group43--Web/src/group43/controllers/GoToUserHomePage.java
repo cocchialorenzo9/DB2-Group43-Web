@@ -20,12 +20,13 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import group43.entities.Product;
 import group43.entities.Questionnaire;
 import group43.entities.Review;
+import group43.exceptions.QuestionnaireException;
 import group43.services.QuestionnaireService;
 
 /**
  * Servlet implementation class GoToHomeUser
  */
-@WebServlet("/GoToUserHomePage")
+@WebServlet("/User/GoToUserHomePage")
 public class GoToUserHomePage extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
@@ -55,34 +56,33 @@ public class GoToUserHomePage extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// If the user is not logged in (not present in session) redirect to the login
-				String loginpath = getServletContext().getContextPath() + "/index.html";
-				HttpSession session = request.getSession();
-				if (session.isNew() || session.getAttribute("user") == null) {
-					response.sendRedirect(loginpath);
-					return;
-				}
-				
-				Questionnaire questionnaireOfTheDay = questionnaireService.findQuestionnaireOfTheDay();
-				
-				String questionnaireNotCreated = "Questionnaire not yet created. Please try again later";
-				
-				Product productOfTheDay = null;
-				
-				List<Review> reviews = null;
-				
-				if(questionnaireOfTheDay != null) {
-					productOfTheDay = questionnaireOfTheDay.getProduct();
-					reviews = questionnaireOfTheDay.getProduct().getReviews();
-				}
-				
-				String path = "/WEB-INF/UserHomePage.html";
-				ServletContext servletContext = getServletContext();
-				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-				ctx.setVariable("reviews", reviews);
-				ctx.setVariable("productOfTheDay", productOfTheDay);
-				ctx.setVariable("questionnaireNotCreated", questionnaireNotCreated);
-				templateEngine.process(path, ctx, response.getWriter());
+		// If the user is not logged in (not present in session) redirect to the login				
+		Questionnaire questionnaireOfTheDay;
+		try {
+			questionnaireOfTheDay = questionnaireService.findQuestionnaireOfTheDay();
+		} catch (QuestionnaireException e) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			return;
+		}
+		
+		String questionnaireNotCreated = "Questionnaire not yet created. Please try again later";
+		
+		Product productOfTheDay = null;
+		
+		List<Review> reviews = null;
+		
+		if(questionnaireOfTheDay != null) {
+			productOfTheDay = questionnaireOfTheDay.getProduct();
+			reviews = questionnaireOfTheDay.getProduct().getReviews();
+		}
+		
+		String path = "/WEB-INF/UserHomePage.html";
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("reviews", reviews);
+		ctx.setVariable("productOfTheDay", productOfTheDay);
+		ctx.setVariable("questionnaireNotCreated", questionnaireNotCreated);
+		templateEngine.process(path, ctx, response.getWriter());
 	}
 
 	/**
