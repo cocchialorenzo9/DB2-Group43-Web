@@ -73,7 +73,7 @@ public class CheckLogin extends HttpServlet {
 		// show login page with error message
 
 		String path;
-		if (user == null || user.isBlocked() == true) {
+		if (user == null) {
 			ServletContext servletContext = getServletContext();
 			path = "/index.html";
 			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
@@ -85,12 +85,19 @@ public class CheckLogin extends HttpServlet {
 				ctx.setVariable("errorMsg", "Username or password are not correct");
 			}
 			
-			if(user.isBlocked() == true) {
-				ctx.setVariable("errorMsg", "You are permanently blocked. Access denied.");
-			}
-			
 			templateEngine.process(path, ctx, response.getWriter());
-		} else {
+			
+		} 
+		else if(user.isBlocked() == true) {
+			ServletContext servletContext = getServletContext();
+			path = "/index.html";
+			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+			ctx.setVariable("errorMsg", "You are permanently blocked. Access denied.");
+			templateEngine.process(path, ctx, response.getWriter());
+		}
+		else {
+			
+			
 			/*
 			request.getSession().setAttribute("Utente", u);
 			String target = (u.getRuolo().equals("Impiegato")) ? "/GoToHomeImpiegato" : "/GoToHomeCliente";
