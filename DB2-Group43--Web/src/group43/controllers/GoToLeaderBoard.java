@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.ejb.EJB;
-import javax.persistence.NonUniqueResultException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -19,7 +17,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import group43.entities.QuestionnaireInteraction;
-import group43.exceptions.CredentialsException;
 import group43.exceptions.QuestionnaireInteractionException;
 import group43.services.QuestionnaireInteractionService;
 

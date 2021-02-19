@@ -130,14 +130,18 @@ public class NewProduct extends HttpServlet {
 			calToday.set(Calendar.HOUR_OF_DAY, 0);
 			calToday.set(Calendar.MINUTE, 0);
 			calToday.set(Calendar.SECOND, 0);
+			calToday.set(Calendar.MILLISECOND, 0);
 			Date today = calToday.getTime();
-			if(date.before(today)) {
-				errString += ": date inserted is before today, can not insert ";
-				error = true;
+
+			if(!date.equals(today)) {
+				if(date.before(today)) {
+					errString += ": date inserted is before today, can not insert ";
+					error = true;
+				}
 			}
 			
+			
 			// call service to check if there is another product date
-			System.out.println(new java.sql.Date(date.getTime()));
 			try {
 				if(questService.isAlreadyDayOfAnotherQuestionnaire(new java.sql.Date(date.getTime()))) {
 					errString += "there is already another product with that date";
@@ -158,7 +162,7 @@ public class NewProduct extends HttpServlet {
 			
 			ctx.setVariable("errorMessage", errString);
 			
-			String path = "/pages/KONewProduct.html";
+			String path = "/WEB-INF/KONewProduct.html";
 			templateEngine.process(path, ctx, response.getWriter());
 			return;
 		}
@@ -176,14 +180,14 @@ public class NewProduct extends HttpServlet {
 		
 		Product newProduct = prodService.newProduct(name, urlImage);
 		Questionnaire questionnaire = questService.newQuestionnaire(sqlDate, idadmin, newProduct.getIdproduct());
-		questionService.newQuestions(questionnaire, marketingQuestions);
+		questionService.newQuestions(questionnaire.getIdquestionnaire(), marketingQuestions);
 		
 		// redirect to ok message, or little AJAX call?
 		// String path = request.getServletContext().getContextPath() + "/Admin/GoToHomepage";
 		// response.sendRedirect(path);
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		String path = "/pages/OKNewProduct.html";
+		String path = "/WEB-INF/OKNewProduct.html";
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 

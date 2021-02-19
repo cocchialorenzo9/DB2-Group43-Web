@@ -22,7 +22,6 @@ import group43.entities.*;
 import group43.exceptions.AnswersException;
 import group43.exceptions.QuestionnaireInteractionException;
 import group43.services.*;
-import group43.utils.AnswersBean;
 
 /**
  * Servlet implementation class GoToHomepageAdmin
@@ -78,15 +77,15 @@ public class GetInspectionPage extends HttpServlet {
 		int idadmin = ((User) request.getSession().getAttribute("user")).getIduser();
 		
 		if(questionnaireToInspect.getUser().getIduser() != idadmin) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only the creator can delete the questionnaire");
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only the creator can inspect this questionnaire");
 			return;
 		}
 		
-		// get the information from services in order to comlete
-		// "product", "completedUsernames", "cancelledUsernames" ,"allAnswers"
+		// get the information from services in order to complete
+		// "completedUsernames", "cancelledUsernames" ,"allAnswers"
 		List<String> completedUsernames = new ArrayList<>();
 		List<String> cancelledUsernames = new ArrayList<>();
-		List<AnswersBean> allAnswers = new ArrayList<>();
+		List<Answer> allAnswers = new ArrayList<>();
 		
 		List<QuestionnaireInteraction> allQIs;
 		try {
@@ -99,31 +98,22 @@ public class GetInspectionPage extends HttpServlet {
 		for(QuestionnaireInteraction interaction : allQIs) {
 			String username = interaction.getUser().getUsername();
 			if(interaction.isCompleted()) {
-				System.out.println("Adding " + username + " to completed list");
+				// System.out.println("Adding " + username + " to completed list");
 				completedUsernames.add(username);
 			} else {
-				System.out.println("Adding " + username + " to cancelled list");
+				// System.out.println("Adding " + username + " to cancelled list");
 				cancelledUsernames.add(username);
 			}
 		}
 		
-		List<Answer> answers = null;
 		try {
-			answers = ansService.findAnswersByQuestionnaireId(questionnaireToInspect.getIdquestionnaire());
+			allAnswers = ansService.findAnswersByQuestionnaireId(questionnaireToInspect.getIdquestionnaire());
 		} catch (AnswersException e) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			return;
 		}
 		
-		System.out.println("Num answers: " + answers.size());
-		
-		for(Answer ans : answers) {
-			String question = ans.getQuestion().getText();
-			String answer = ans.getText();
-			String username = ans.getUser().getUsername();
-			AnswersBean newBean = new AnswersBean(question, answer, username);
-			allAnswers.add(newBean);
-		}
+		System.out.println("Num answers: " + allAnswers.size());
 		
 		// set the contect in thymeleaf to provide to the template
 		// "product", "completedUsernames", "cancelledUsernames" ,"allAnswers"

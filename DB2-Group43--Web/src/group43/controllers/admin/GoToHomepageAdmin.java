@@ -1,10 +1,7 @@
 package group43.controllers.admin;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletContext;
@@ -20,8 +17,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import group43.entities.Product;
-import group43.entities.Questionnaire;
-import group43.entities.User;
 import group43.exceptions.ProductException;
 import group43.services.ProductService;
 
@@ -50,34 +45,19 @@ public class GoToHomepageAdmin extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		// thanks to the filter, I am sure that exists a valid session and that user is logged as admin		
-		// retrieve the idcreator from the session
-		User admin = (User) request.getSession().getAttribute("user");
-		int idcreator = admin.getIduser();
-		
-		// retrieve all the admin products
-		List<Product> adminProducts = null;
+		//retrieve all the products
+		List<Product> allProducts = null;
 		try {
-			adminProducts = prodService.findProductsByCreatorId(idcreator);
+			allProducts = prodService.findAll();
 		} catch (ProductException e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		}
-		
-		// retrieve all the product days
-		// mapping each product with its integer id and its date in which it is product of the day
-		Map<Integer, Date> productDays = new HashMap<>();
-		for(Product p: adminProducts) {
-			Date date = p.getQuestionnaire().getDate();
-			productDays.put(p.getIdproduct(), date);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 		
 		// set the "adminProducts", "productDays" on the Thymeleaf context
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		
-		ctx.setVariable("adminProducts", adminProducts);
-		ctx.setVariable("productDays", productDays);
+		ctx.setVariable("allProducts", allProducts);
 		
 		// redirect to AdminHomePage
 		String path = "/WEB-INF/AdminHomePage.html";

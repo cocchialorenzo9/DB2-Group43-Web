@@ -13,7 +13,7 @@
 <div class="newProduct">
 	<span class="text" > <a th:href="@{/Admin/GetCreationPage}"> <b>Click</b> </a> to create a new product of the day </span>
 </div>
-	<div class="productTable" th:if="${not #lists.isEmpty(adminProducts)}">
+	<div class="productTable" th:if="${not #lists.isEmpty(allProducts)}">
 		<table border="1">
 			<thead>
 				<tr>
@@ -25,20 +25,27 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="product : ${adminProducts}">
+				<tr th:each="product : ${allProducts}">
 					<td th:text="${product.name}">Mock name</td>
 					<td><img th:src="@{${product.image}}" class="image"/></td>
-					<td th:text="${#dates.format(productDays.get(__${product.idproduct}__), 'dd/MMM/yyyy')}">Mock date</td>
+					<td th:text="${#dates.format(product.getQuestionnaire().getDate(), 'dd/MMM/yyyy')}">Mock date</td>
 					<td>
+					<span th:if="${session.user.getIduser() == product.getQuestionnaire().getUser().getIduser()}">
 						<a th:href="@{/Admin/GetInspectionPage(idproduct=${product.idproduct})}">More info</a>
+					</span>
+					<span th:if="not ${session.user.getIduser() == product.getQuestionnaire().getUser().getIduser()}">
+						Can't inspect
+					</span>
 					</td>
 					<td>
 						<!-- checking if the date is right to allow deletion -->
 						 
-						<span th:if="${productDays.get(__${product.idproduct}__).before(#dates.createToday())}">
+						<span th:if="${product.getQuestionnaire().getDate().before(#dates.createToday()) and 
+								session.user.getIduser() == product.getQuestionnaire().getUser().getIduser()}">
 							<a th:href="@{/Admin/DeleteQuestionnaire(idproduct=${product.idproduct})}">Delete this</a>
 						</span>
-						<span th:if="not ${productDays.get(__${product.idproduct}__).before(#dates.createToday())}">
+						<span th:if="not ${product.getQuestionnaire().getDate().before(#dates.createToday()) and 
+								session.user.getIduser() == product.getQuestionnaire().getUser().getIduser()}">
 							Can't delete
 						</span>
 						
@@ -48,8 +55,8 @@
 		</table>
 	</div>
 	
-	<div th:if="${#lists.isEmpty(adminProducts)}" style="margin-left:3%">
-		<p class="text">You have no products yet <a th:href="@{/Admin/GetCreationPage}" class="text">click here</a> to create a new one!</p>
+	<div th:if="${#lists.isEmpty(allProducts)}" style="margin-left:3%">
+		<p class="text">There are no products yet <a th:href="@{/Admin/GetCreationPage}" class="text">click here</a> to create a new one!</p>
 	</div>
 
 </body>

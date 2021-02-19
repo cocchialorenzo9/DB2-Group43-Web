@@ -17,7 +17,6 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import group43.entities.User;
 import group43.exceptions.CredentialsException;
 import group43.services.UserService;
 

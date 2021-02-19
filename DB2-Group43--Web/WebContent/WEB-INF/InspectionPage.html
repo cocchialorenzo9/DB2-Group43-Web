@@ -74,9 +74,9 @@
 		</thead>
 		<tbody>
 			<tr th:each="ans : ${allAnswers}">
-				<td th:text="${ans.question}">Mock text</td>
-				<td th:text="${ans.answer}">Mock text</td>
-				<td th:text="${ans.username}">Mock text</td>
+				<td th:text="${ans.question.text}">Mock text</td>
+				<td th:text="${ans.text}">Mock text</td>
+				<td th:text="${ans.user.username}">Mock text</td>
 			</tr>
 		</tbody>
 	</table>

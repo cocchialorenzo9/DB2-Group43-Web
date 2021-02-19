@@ -74,6 +74,7 @@ public class DeleteQuestionnaire extends HttpServlet {
 		calToday.set(Calendar.HOUR_OF_DAY, 0);
 		calToday.set(Calendar.MINUTE, 0);
 		calToday.set(Calendar.SECOND, 0);
+		calToday.set(Calendar.MILLISECOND, 0);
 		Date today = calToday.getTime();
 		if(today.before(questToDelete.getDate())) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You can delete only dates before of today");
@@ -86,9 +87,9 @@ public class DeleteQuestionnaire extends HttpServlet {
 		// redirect to ok, ko pages
 		String path = "";
 		if(retCode == -1) {
-			path = "/pages/KODelete.html";
+			path = "/WEB-INF/KODelete.html";
 		} else {
-			path = "/pages/OKDelete.html";
+			path = "/WEB-INF/OKDelete.html";
 		}
 		
 		ServletContext servletContext = getServletContext();
