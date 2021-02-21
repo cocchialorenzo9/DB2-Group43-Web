@@ -59,10 +59,12 @@ public class GetQuestionnaire extends HttpServlet {
 		// Retrieve the user from the Session
 		User user = (User) session.getAttribute("user");
 		
+		
 		// Declaring the useful Entities
 		Questionnaire questionnaireOfTheDay = null;
 		Product product = null;
 		List<Question> questions = null;
+		QuestionnaireInteraction interaction = null;
 		
 		// functional variable 
 		String productErrorMsg = null;
@@ -74,40 +76,50 @@ public class GetQuestionnaire extends HttpServlet {
 		// Getting questionnaire of the Day
 		try {
 			questionnaireOfTheDay = qService.findQuestionnaireOfTheDay();
-			
-			if (questionnaireOfTheDay == null) 
-				productErrorMsg = "No Questionnaire is available for today, try again tomorrow";
-			else { 
-				// If the is a questionnaire of the day
-				questionnaireId = questionnaireOfTheDay.getIdquestionnaire();
-				// getting the product of the day
-				product = questionnaireOfTheDay.getProduct();
-				// getting the questions of the questionnaire of the day
-				questions = questionnaireOfTheDay.getQuestions();
-
-				if (questions == null || questions.isEmpty())
-					questionErrorMsg = "No questions available for the questionnaire of the day. Sorry";
-				else {
-					// getting useful parameters for answering settings
-					questionsNumber = questions.size();
-					firstIndex = questions.get(0).getIdquestion();
-				}
-					
-				// Handling interaction and time stamp insertion or updating
-				try {
-					handleLogInteraction(user.getIduser(), questionnaireOfTheDay.getIdquestionnaire());
-				}
-				catch (LastInteractionException e) {
-					e.printStackTrace();
-					return;
-				}
-
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
-		}
+		}	
 		
+		if (questionnaireOfTheDay == null) 
+			productErrorMsg = "No Questionnaire is available for today, try again tomorrow";
+		else { 
+			// If the is a questionnaire of the day
+			questionnaireId = questionnaireOfTheDay.getIdquestionnaire();
+				
+			try {
+				// if the questionnaire exists, retrieving the last interaction of the user
+				// to check whether he already filled up a questionnaire or not
+				interaction = iService.findLastInteraction(user.getIduser(), questionnaireId);
+			} catch (Exception e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in searching for the last interaction of the user");
+				return;
+			}
+			
+			// if the user already filled up the questionnaire
+			if(interaction != null && interaction.isCompleted()) {
+				// Redirect to the already filled page and add error message to be displayed
+				String path = "/WEB-INF/AlreadyFilledPage.html";
+				ServletContext servletContext = getServletContext();
+				final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+				templateEngine.process(path, ctx, response.getWriter());
+				return ;
+			}
+			
+			// getting the product of the day
+			product = questionnaireOfTheDay.getProduct();
+			// getting the questions of the questionnaire of the day
+			questions = questionnaireOfTheDay.getQuestions();
+
+			if (questions == null || questions.isEmpty())
+				questionErrorMsg = "No questions available for the questionnaire of the day. Sorry";
+			else {
+				// getting useful parameters for answering settings
+				questionsNumber = questions.size();
+				firstIndex = questions.get(0).getIdquestion();
+			}
+
+		}
 		
 		// Redirect to the Home page and add product to the parameters
 		String path = "/WEB-INF/QuestionnairePage.html";
@@ -123,20 +135,6 @@ public class GetQuestionnaire extends HttpServlet {
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 	
-	public boolean handleLogInteraction(int userId, int questionnaireId) throws LastInteractionException {
-		
-		// Checking if the user already has an interaction with the questionnaire
-		QuestionnaireInteraction interaction = null;
-		interaction = iService.findLastInteraction(userId, questionnaireId);
-		
-		// If no interaction is present, then add an interaction
-		if(interaction == null)
-			iService.insertInteraction(userId, questionnaireId);
-		else // otherwise update the interaction
-			iService.UpdateInteraction(interaction.getIdquestionnaire_interaction());
-		
-		return true;
-	}
 
 	public void destroy() {}
 

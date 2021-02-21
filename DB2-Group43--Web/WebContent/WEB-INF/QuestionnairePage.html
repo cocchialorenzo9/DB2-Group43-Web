@@ -3,7 +3,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Questionnaire page</title>
-<link rel="stylesheet" type="text/css" href="questionnairePage.css">
+<link rel="stylesheet" type="text/css" th:href="@{/css/questionnairePage.css}">
 </head>
 
 <body th:onload="showMarketing()">
@@ -52,6 +52,7 @@
 					</fieldset>
 						
 					<button type="button" th:onclick="ValidateMarketingSection()">Next</button>
+					<span><a class="fakeButton" th:href="@{/User/InsertInteraction}">Cancel</a> </span>
 				</div>
 				
 				<!--  displaying statistical questions seconds -->
@@ -86,7 +87,7 @@
 					<input type="hidden" th:value="${questionnaireId}" name="questionnaireId"/>
 					
 					<span><button type="button" th:onclick="showMarketing()">Previous</button></span>
-					<span><a class="fakeButton" th:href="@{/GoToUserHomePage}">Cancel</a> </span>
+					<span><a class="fakeButton" th:href="@{/User/InsertInteraction}">Cancel</a> </span>
 					<span><input type="submit" name="Submit"></span>
 	
 				</div>

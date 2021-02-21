@@ -20,6 +20,8 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import group43.services.*;
 import group43.entities.*;
+import group43.exceptions.LastInteractionException;
+import group43.exceptions.UpdateInteractionException;
 
 @WebServlet("/User/InsertAnswers")
 public class InsertAnswers extends HttpServlet {
@@ -152,14 +154,28 @@ public class InsertAnswers extends HttpServlet {
 			firstQuestionId++;
 		}
 		
-		// Then also answers to the Statistical Section can be inserted: in this case the operation required is the 
-		// updating of the corresponding questionnaireInteraction
+		// Then also answers to the Statistical Section can be inserted: in this case the operation requires to insert
+		// a new interaction or to update the corresponding questionnaireInteraction
+		
+		// Checking if the user already has an interaction with the questionnaire
+		QuestionnaireInteraction interaction = null;
 		try {
-			iService.updateStatisticalSection(user.getIduser(), questionnaireId, age, sex, explevel);
-		} catch (Exception e) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong: impossible to update the last interaction of the user");
-			return;
+			interaction = iService.findLastInteraction(user.getIduser(), questionnaireId);
+		} catch (LastInteractionException e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in searching for the last interaction of the user");
 		}
+						
+		// If no interaction is present, then add an interaction
+		if(interaction == null)
+			iService.insertInteractionWithStatistics(user.getIduser(), questionnaireId, age, explevel, sex);
+		else {
+			try {
+				iService.updateStatisticalSection(interaction.getIdquestionnaire_interaction(), age, sex, explevel);
+			} catch (UpdateInteractionException e) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "something went wrong in updating the last interaction of the user");
+			}
+		}
+
 			
 		// Redirecting the User to the greetings Page
 		String ctxpath = getServletContext().getContextPath();
