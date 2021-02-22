@@ -53,7 +53,6 @@ public class GoToHomepageAdmin extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 		
-		// set the "adminProducts", "productDays" on the Thymeleaf context
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		

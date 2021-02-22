@@ -87,11 +87,6 @@ public class InsertAnswers extends HttpServlet {
 			return;
 		}
 		
-		if(word_list == null) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No Offensive word in the database");
-			return;
-		}
-		
 		boolean toBeBlocked = false;
 		
 		// Processing the answers from the Marketing Sessions, checking for the offensive words list and retrieving
@@ -142,7 +137,7 @@ public class InsertAnswers extends HttpServlet {
 		}
 		
 		
-		// IF all went wrong, Answers to the Marketing section can be inserted
+		// IF all went well, Answers to the Marketing section can be inserted
 		for(Integer i = 0; i < answers.size(); i++) {	
 			try {
 				aService.insertAnswer(user.getIduser(), answers.get(i), firstQuestionId);

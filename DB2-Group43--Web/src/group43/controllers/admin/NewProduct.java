@@ -1,7 +1,6 @@
 package group43.controllers.admin;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,12 +11,10 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -143,6 +140,8 @@ public class NewProduct extends HttpServlet {
 			
 			// call service to check if there is another product date
 			try {
+				System.out.println("Date before transformation: " + date);
+				System.out.println("Checking for date: " + new java.sql.Date(date.getTime()));
 				if(questService.isAlreadyDayOfAnotherQuestionnaire(new java.sql.Date(date.getTime()))) {
 					errString += "there is already another product with that date";
 					error = true;
@@ -156,7 +155,6 @@ public class NewProduct extends HttpServlet {
 		// error checking
 		if(error) {
 			errString += " >> try again.";
-			// response.sendError(HttpServletResponse.SC_BAD_REQUEST, errString + ">> go back and correct the data");
 			ServletContext servletContext = getServletContext();
 			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 			
@@ -182,9 +180,6 @@ public class NewProduct extends HttpServlet {
 		Questionnaire questionnaire = questService.newQuestionnaire(sqlDate, idadmin, newProduct.getIdproduct());
 		questionService.newQuestions(questionnaire.getIdquestionnaire(), marketingQuestions);
 		
-		// redirect to ok message, or little AJAX call?
-		// String path = request.getServletContext().getContextPath() + "/Admin/GoToHomepage";
-		// response.sendRedirect(path);
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		String path = "/WEB-INF/OKNewProduct.html";
